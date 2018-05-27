@@ -1,0 +1,131 @@
+{% extends 'reservation/base.html' %}
+{% load static %}
+{% block head %}
+{% endblock %}
+{% block content %}
+        <div class="container">
+            <h3>Booking Table Service!</h3>
+        </div>
+        <hr>
+        <div class="container">
+        <!-- Modal Trigger -->
+        <button data-target="modal1" class="btn modal-trigger" style="display: none;">Modal</button>
+        <!-- Modal Structure -->
+        <div id="modal1" class="modal">
+            <div class="modal-content">
+                <div class="row">
+                    <form class="col s12" method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="input-field col s12">
+                              <i class="material-icons prefix">account_circle</i>
+                                {{ form.first_name }}
+                              <label for="icon_prefix">First Name</label>
+                            </div>
+                            <div class="input-field col s12">
+                              <i class="material-icons prefix">account_circle</i>
+                                {{ form.last_name }}
+                              <label for="icon_prefix">Last Name</label>
+                            </div>
+                            <div class="input-field col s12">
+                              <i class="material-icons prefix">email</i>
+                                {{ form.email }}
+                              <label for="icon_prefix">Email</label>
+                            </div>
+                            <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+                            <i class="material-icons right">send</i>
+                            </button>
+                          </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row wrapperFromDate valign-wrapper">
+                <div class="col s4 Text01">
+                    {{ form.order_date.label_tag }}
+                </div>
+                <div class="col s2">
+                  {{ form.order_date }}
+                </div>
+                <div class="col s6"></div>
+                {% if form.order_date.errors %}
+                <div class="col s3">
+                    <h3 class="errors">{{ form.order_date.errors }}</h3>
+                </div>
+            {% endif %}
+            </div>
+        <div class="container">
+            <div class="wrapperForCol">
+            <div class="row">
+            {% for x in scheme %}
+                {% for y in x %}
+                        {% if y %}
+                            {% if y.shape == 'Rectangle' %}
+                                <div class="col s12 m2">
+                                  <a  id="{{ y.table_id }}" style="outline: none;
+                                                                    color: #000 !important;
+                                                                    text-decoration: none">
+                                     <img class="image" width="100" height="100"
+                                             src="{% static 'reservation/src/img/square.png' %}">
+                                      {{ form.table_id }}
+                                  </a>
+                                </div>
+                            {% else %}
+                                <div class="col s12 m2">
+                                  <a  id="{{ y.table_id }}"  style="outline: none;
+                                                                    color: #000 !important;
+                                                                    text-decoration: none">
+                                        <img class="image" width="100" height="100"
+                                             src="{% static 'reservation/src/img/round.png' %}">
+                                        {{ form.table_id }}
+                                  </a>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="col s12 m2">
+                                 <a class='EmptyPlace' href="/">
+                                      <img class="image" width="100" height="100"
+                                             src="https://png.icons8.com/metro/1600/delete-sign.png">
+                                 </a>
+                            </div>
+                        {% endif %}
+                {% endfor %}
+            {% endfor %}
+            </div>
+            <style>
+                .wrapperForCol > div{
+                    float: left;
+                }
+            </style>
+        </div>
+    </div>
+    </div>
+</div>
+    <style>
+    .Text01 label{
+        color: #000;
+        font-size: 18px;
+    }
+    .waves-effect{
+        float: right;
+    }
+    .redStyle{
+        background: red;
+        display: block;
+    }
+    .greenStyle{
+        background: green;
+        display: block;
+    }
+    .square{
+        background-color: rgba(0,128,0, 0.5);
+        display: block;
+    }
+    .square-new{
+        background: green;
+        display: block;
+    }
+    </style>
+{% endblock %}

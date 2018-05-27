@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Table Reservation</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+    <header>
+    {% block header %}
+    {% endblock %}
+    </header>
+    <main>
+        <div id="content">
+           {% block content %}
+           {% endblock %}
+        </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+    <script>
+        jQuery(document).ready(function(){
+            jQuery('.modal').modal();
+        });
+    </script>
+    <script>
+    $(document).ready(function() {
+    let date = $('.datepicker').val();
+    $.ajax({
+            type: 'POST',
+            url: '/ajax/checkdate/',
+            data: {
+                'date': date
+            },
+            success: function (response) {
+                let reserved_tables = JSON.parse(response.reserved_tables);
+                let all_tables = JSON.parse(response.all_tables);
+                let reserved_list = [];
+                let all_list = [];
+                if (reserved_tables.length > 0) {
+                    for (let i = 0; i < reserved_tables.length; i++){
+                        reserved_list.push(reserved_tables[i].fields['table']);
+                    }
+                }
+                if (all_tables.length > 0) {
+                    for (let i = 0; i < all_tables.length; i++){
+                        all_list.push(all_tables[i].fields['table_id']);
+                    }
+                }
+                $('.greenStyle.redStyle').removeClass('greenStyle redStyle');
+                for (let t = 0; t < all_list.length; t++){
+                    if (reserved_list.indexOf(parseInt(all_tables[t].fields['table_id'])) != -1 ){
+                        console.log('Hi!');
+                        let element = document.getElementById(all_tables[t].fields['table_id']);
+                        element.classList.add("redStyle");
+                    } else {
+                        var element = document.getElementById(all_tables[t].fields['table_id']);
+                        element.classList.add("greenStyle");
+                    }
+                }
+                jQuery('.greenStyle').click(function () {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        id: 'table_id',
+                        name: 'table_id',
+                        value: this.id,
+                    }).appendTo('#modal1 form');
+                    $('<input>').attr({
+                        type: 'hidden',
+                        id: 'order_date',
+                        name: 'order_date',
+                        value: $('#date_for').val()
+                    }).appendTo('#modal1 form');
+                    jQuery('.btn.modal-trigger').trigger('click');
+                });
+            }
+        });
+    });
+    $.ajaxSetup({
+     beforeSend: function(xhr, settings) {
+         function getCookie(name) {
+             var cookieValue = null;
+             if (document.cookie && document.cookie != '') {
+                 var cookies = document.cookie.split(';');
+                 for (var i = 0; i < cookies.length; i++) {
+                     var cookie = jQuery.trim(cookies[i]);
+                     // Does this cookie string begin with the name we want?
+                     if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                         break;
+                     }
+                 }
+             }
+             return cookieValue;
+         }
+         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+             // Only send the token to relative URLs i.e. locally.
+             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+         }
+     }
+    });
+
+    $(".datepicker").change(function () {
+        let date = $(this).val();
+        $.ajax({
+            type: 'POST',
+            url: '/ajax/checkdate/',
+            data: {
+                'date': date
+            },
+            success: function (response) {
+                let reserved_tables = JSON.parse(response.reserved_tables);
+                let all_tables = JSON.parse(response.all_tables);
+                let reserved_list = [];
+                let all_list = [];
+                if (reserved_tables.length > 0) {
+                    for (let i = 0; i < reserved_tables.length; i++){
+                        reserved_list.push(parseInt(reserved_tables[i].fields['table']));
+                    }
+                }
+                if (all_tables.length > 0) {
+                    for (let i = 0; i < all_tables.length; i++){
+                        all_list.push(parseInt(all_tables[i].fields['table_id']));
+                    }
+                }
+                $('.greenStyle.redStyle').removeClass('greenStyle redStyle');
+                for (let t = 0; t < all_list.length; t++){
+                    if (reserved_list.indexOf(parseInt(all_tables[t].fields['table_id'])) != -1 ){
+                        let element = document.getElementById(all_tables[t].fields['table_id']);
+                        element.classList.add("redStyle");
+                    } else {
+                        let element = document.getElementById(all_tables[t].fields['table_id']);
+                        element.classList.add("greenStyle");
+                    }
+                }
+            }
+        });
+    });
+
+/******************************************/
+    jQuery(document).ready(function() {
+        jQuery('.datepicker').datepicker({
+            format: 'mm/dd/yyyy'
+        });
+    });
+/******************************************/
+    </script>
+    <style>
+        .redStyle{
+            cursor: text;
+        }
+    </style>
+    </main>
+    <footer>
+    {% block footer %}
+    {% endblock %}
+    </footer>
+</body>
+</html>
+
+
